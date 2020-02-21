@@ -1,10 +1,12 @@
-import React, { useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as d3 from "d3";
+import * as R from "ramda";
 import "./App.css";
 
 function App() {
   const svgRef = useRef();
-  const data = [10, 20, 30, 40, 50];
+  const randomData = [10, 20, 30, 40, 50];
+  const [data, setData] = useState(randomData);
   const width = 800;
   const height = 650;
   useEffect(() => {
@@ -40,6 +42,20 @@ function App() {
       <div>
         <h3>{`svg ${width}* ${height}`}</h3>
         <svg ref={svgRef} />
+        <div>
+          <button
+            onClick={() => {
+              const updatedData = data.map(d => {
+                return d + Math.floor(Math.random() * Math.floor(10));
+              });
+
+              const sortUpdatedData = R.sort((a, b) => b - a)(updatedData);
+              setData(sortUpdatedData);
+            }}
+          >
+            測試
+          </button>
+        </div>
       </div>
     </div>
   );
