@@ -17,14 +17,21 @@ function App() {
       .domain([0, d3.max(data, d => d)])
       .range([0, width]);
 
+    const yScale = d3
+      .scaleBand()
+      .paddingOuter(0.1)
+      .paddingInner(0.1)
+      .domain(data.map((d, i) => i))
+      .range([0, height]);
+
     svg
       .selectAll("rect")
       .data(data, d => d)
       .join("rect")
       .attr("x", xScale(0))
-      .attr("y", (d, i) => i * 50)
+      .attr("y", (d, i) => yScale(i))
       .attr("width", d => xScale(d) - xScale(0))
-      .attr("height", 50)
+      .attr("height", yScale.bandwidth())
       .attr("fill", "DarkBlue");
   }, [data, svgRef.current]);
 
