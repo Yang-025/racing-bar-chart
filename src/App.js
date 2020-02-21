@@ -3,10 +3,41 @@ import * as d3 from "d3";
 import * as R from "ramda";
 import "./App.css";
 
+
+function rankData(data) {
+  const sortUpdatedData = R.sortWith([R.descend(R.prop("number"))])(data);
+
+  const addRankDataset = sortUpdatedData.map((d, i) => {
+    return { ...d, rank: i + 1 };
+  });
+  return addRankDataset;
+}
+
 function App() {
   const svgRef = useRef();
-  const randomData = [10, 20, 30, 40, 50];
-  const [data, setData] = useState(randomData);
+  const randomData = [
+    {
+      name: "A",
+      number: 10
+    },
+    {
+      name: "B",
+      number: 20
+    },
+    {
+      name: "C",
+      number: 30
+    },
+    {
+      name: "D",
+      number: 40
+    },
+    {
+      name: "E",
+      number: 50
+    }
+  ];
+  const [data, setData] = useState(rankData(randomData));
   const width = 800;
   const height = 650;
   useEffect(() => {
@@ -16,23 +47,23 @@ function App() {
 
     const xScale = d3
       .scaleLinear()
-      .domain([0, d3.max(data, d => d)])
+      .domain([0, d3.max(data, d => d.number)])
       .range([0, width]);
 
     const yScale = d3
       .scaleBand()
       .paddingOuter(0.1)
       .paddingInner(0.1)
-      .domain(data.map((d, i) => i))
+      .domain(data.map((d, i) => d.rank))
       .range([0, height]);
 
     svg
       .selectAll("rect")
-      .data(data, d => d)
+      .data(data, d => d.name)
       .join("rect")
       .attr("x", xScale(0))
-      .attr("y", (d, i) => yScale(i))
-      .attr("width", d => xScale(d) - xScale(0))
+      .attr("y", (d) => yScale(d.rank))
+      .attr("width", d => xScale(d.number) - xScale(0))
       .attr("height", yScale.bandwidth())
       .attr("fill", "DarkBlue");
   }, [data, svgRef.current]);
@@ -46,11 +77,13 @@ function App() {
           <button
             onClick={() => {
               const updatedData = data.map(d => {
-                return d + Math.floor(Math.random() * Math.floor(10));
+                return {
+                  ...d,
+                  number: d.number + Math.floor(Math.random() * Math.floor(10))
+                };
               });
 
-              const sortUpdatedData = R.sort((a, b) => b - a)(updatedData);
-              setData(sortUpdatedData);
+              setData(rankData(updatedData));
             }}
           >
             測試
