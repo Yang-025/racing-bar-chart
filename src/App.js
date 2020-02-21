@@ -12,13 +12,18 @@ function App() {
 
     svg.style("width", width).style("height", height);
 
+    const xScale = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, d => d)])
+      .range([0, width]);
+
     svg
       .selectAll("rect")
       .data(data, d => d)
       .join("rect")
-      .attr("x", 0)
+      .attr("x", xScale(0))
       .attr("y", (d, i) => i * 50)
-      .attr("width", d => d)
+      .attr("width", d => xScale(d) - xScale(0))
       .attr("height", 50)
       .attr("fill", "DarkBlue");
   }, [data, svgRef.current]);
