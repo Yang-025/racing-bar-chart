@@ -41,8 +41,8 @@ function App() {
   const width = 800;
   const height = 650;
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
-  const tickDuration = 1000;
-
+  const initTickDuration = 1000;
+  const [tickDuration, setTickDuration] = useState(null);
 
   const xScale = d3
     .scaleLinear()
@@ -122,7 +122,13 @@ function App() {
         <h3>{`svg ${width}* ${height}`}</h3>
         <svg ref={svgRef} />
         <div>
-          <button onClick={updateDataset}>測試</button>
+          {/* 手動  const [tickDuration, setTickDuration] = useState(initTickDuration); */}
+          {/* <button onClick={updateDataset}>測試</button> */}
+          {/* 自動 */}
+          <button onClick={() => setTickDuration(initTickDuration)}>
+            測試
+          </button>
+          <button onClick={() => setTickDuration(null)}>停止</button>
         </div>
       </div>
     </div>
