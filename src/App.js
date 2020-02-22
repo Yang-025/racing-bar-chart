@@ -78,10 +78,13 @@ function App() {
     const colorScale = d3
       .scaleOrdinal(d3.schemeTableau10)
       .domain(["A", "B", "C", "D", "E"]);
+
+    /* *************** 長條 *************** */
     svg
       .selectAll("rect")
       .data(data, d => d.name)
       .join("rect")
+      .attr("fill-opacity", 0.6)
       .attr("x", xScale(0))
       .attr("height", yScale.bandwidth())
       .attr("fill", d => colorScale(d.name))
@@ -90,15 +93,51 @@ function App() {
       .duration(tickDuration)
       .attr("y", d => yScale(d.rank))
       .attr("width", d => xScale(d.number) - xScale(0));
+    /* *************** 長條 END *************** */
 
-    /* ***** xAxis ***** */
+    /* *************** 隊伍名稱 *************** */
+    svg
+      .selectAll("text.teamname")
+      .data(data, d => d.name)
+      .join("text")
+      .attr("fill-opacity", 0.7)
+      .attr("class", "teamname")
+      .attr("font-weight", "bold")
+      .style("text-anchor", "end")
+      .style("dominant-baseline", "middle")
+      .text(d => d.name)
+      .transition()
+      .duration(tickDuration)
+      .ease(d3.easeLinear)
+      .attr("x", d => xScale(d.number) - 6)
+      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2);
+    /* *************** 隊伍名稱 END *************** */
+
+    /* *************** 隊伍勝場 *************** */
+    svg
+      .selectAll("text.teamvalue")
+      .data(data, d => d.name)
+      .join("text")
+      .attr("class", "teamvalue")
+      .attr("dy", "20")
+      .style("text-anchor", "end")
+      .style("dominant-baseline", "middle")
+      .text(d => d.number)
+      .transition()
+      .duration(tickDuration)
+      .ease(d3.easeLinear)
+      .attr("x", d => xScale(d.number) - 6)
+      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2);
+    /* *************** 隊伍勝場 END *************** */
+
+    /* *************** x軸 *************** */
     svg
       .selectAll(".xAxis")
       .transition()
       .duration(tickDuration)
       .ease(d3.easeLinear)
       .call(xAxis);
-    /* ***** xAxis ***** */
+    /* *************** x軸 END *************** */
   }, [data, svgRef.current]);
 
   function updateDataset() {
