@@ -127,7 +127,13 @@ function App() {
       .duration(tickDuration)
       .ease(d3.easeLinear)
       .attr("x", d => xScale(d.number) - 6)
-      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2);
+      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2)
+      .tween("text", function(d) {
+        let i = d3.interpolateRound(d.last_number || d.number, d.number);
+        return function(t) {
+          this.textContent = d3.format(",")(i(t));
+        };
+      });
     /* *************** 隊伍勝場 END *************** */
 
     /* *************** x軸 *************** */
@@ -144,7 +150,8 @@ function App() {
     const updatedData = data.map(d => {
       return {
         ...d,
-        number: d.number + Math.floor(Math.random() * Math.floor(200))
+        number: d.number + Math.floor(Math.random() * Math.floor(200)),
+        last_number: d.number
       };
     });
 
