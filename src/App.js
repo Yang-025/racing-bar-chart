@@ -39,7 +39,9 @@ function App() {
   const [data, setData] = useState(rankData(randomData));
   const width = 800;
   const height = 650;
-
+  const margin = { top: 30, right: 30, bottom: 30, left: 30 };
+  const tickDuration = 500;
+  
   useEffect(() => {
     const svg = d3.select(svgRef.current);
 
@@ -48,14 +50,14 @@ function App() {
     const xScale = d3
       .scaleLinear()
       .domain([0, d3.max(data, d => d.number)])
-      .range([0, width]);
+      .range([margin.left, width - margin.right]);;
 
     const yScale = d3
       .scaleBand()
       .paddingOuter(0.1)
       .paddingInner(0.1)
       .domain(data.map((d, i) => d.rank))
-      .range([0, height]);
+      .range([margin.top, height - margin.bottom]);
 
     const colorScale = d3
       .scaleOrdinal(d3.schemeTableau10)
@@ -69,9 +71,23 @@ function App() {
       .attr("fill", d => colorScale(d.name))
       .transition()
       .ease(d3.easeLinear)
-      .duration(500)
+      .duration(tickDuration)
       .attr("y", d => yScale(d.rank))
       .attr("width", d => xScale(d.number) - xScale(0));
+
+
+    /* ***** xAxis ***** */
+    const xAxis = d3.axisTop().scale(xScale);
+
+    svg
+      .append("g")
+      .attr("class", "axis xAxis")
+      .attr("transform", `translate(0, ${margin.top})`)
+      .transition()
+      .duration(tickDuration)
+      .ease(d3.easeLinear)
+      .call(xAxis);
+    /* ***** xAxis ***** */
 
   }, [data, svgRef.current]);
 
