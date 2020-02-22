@@ -65,10 +65,13 @@ function App() {
       .data(data, d => d.name)
       .join("rect")
       .attr("x", xScale(0))
-      .attr("y", d => yScale(d.rank))
-      .attr("width", d => xScale(d.number) - xScale(0))
       .attr("height", yScale.bandwidth())
-      .attr("fill", d => colorScale(d.name));
+      .attr("fill", d => colorScale(d.name))
+      .transition()
+      .ease(d3.easeLinear)
+      .duration(500)
+      .attr("y", d => yScale(d.rank))
+      .attr("width", d => xScale(d.number) - xScale(0));
 
   }, [data, svgRef.current]);
 
