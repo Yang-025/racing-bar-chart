@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import * as d3 from "d3";
 import * as R from "ramda";
 import "./App.css";
+import useInterval from "./hooks/useInterval";
 
 function rankData(data) {
   const sortUpdatedData = R.sortWith([R.descend(R.prop("number"))])(data);
@@ -40,7 +41,8 @@ function App() {
   const width = 800;
   const height = 650;
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
-  const tickDuration = 500;
+  const tickDuration = 1000;
+
 
   const xScale = d3
     .scaleLinear()
@@ -99,26 +101,28 @@ function App() {
     /* ***** xAxis ***** */
   }, [data, svgRef.current]);
 
+  function updateDataset() {
+    const updatedData = data.map(d => {
+      return {
+        ...d,
+        number: d.number + Math.floor(Math.random() * Math.floor(200))
+      };
+    });
+
+    setData(rankData(updatedData));
+  }
+
+  useInterval(() => {
+    updateDataset();
+  }, tickDuration);
+
   return (
     <div className="app">
       <div>
         <h3>{`svg ${width}* ${height}`}</h3>
         <svg ref={svgRef} />
         <div>
-          <button
-            onClick={() => {
-              const updatedData = data.map(d => {
-                return {
-                  ...d,
-                  number: d.number + Math.floor(Math.random() * Math.floor(200))
-                };
-              });
-
-              setData(rankData(updatedData));
-            }}
-          >
-            測試
-          </button>
+          <button onClick={updateDataset}>測試</button>
         </div>
       </div>
     </div>
