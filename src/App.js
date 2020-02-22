@@ -3,7 +3,6 @@ import * as d3 from "d3";
 import * as R from "ramda";
 import "./App.css";
 
-
 function rankData(data) {
   const sortUpdatedData = R.sortWith([R.descend(R.prop("number"))])(data);
 
@@ -40,6 +39,7 @@ function App() {
   const [data, setData] = useState(rankData(randomData));
   const width = 800;
   const height = 650;
+
   useEffect(() => {
     const svg = d3.select(svgRef.current);
 
@@ -57,15 +57,19 @@ function App() {
       .domain(data.map((d, i) => d.rank))
       .range([0, height]);
 
+    const colorScale = d3
+      .scaleOrdinal(d3.schemeTableau10)
+      .domain(["A", "B", "C", "D", "E"]);
     svg
       .selectAll("rect")
       .data(data, d => d.name)
       .join("rect")
       .attr("x", xScale(0))
-      .attr("y", (d) => yScale(d.rank))
+      .attr("y", d => yScale(d.rank))
       .attr("width", d => xScale(d.number) - xScale(0))
       .attr("height", yScale.bandwidth())
-      .attr("fill", "DarkBlue");
+      .attr("fill", d => colorScale(d.name));
+
   }, [data, svgRef.current]);
 
   return (
@@ -79,7 +83,7 @@ function App() {
               const updatedData = data.map(d => {
                 return {
                   ...d,
-                  number: d.number + Math.floor(Math.random() * Math.floor(10))
+                  number: d.number + Math.floor(Math.random() * Math.floor(200))
                 };
               });
 
