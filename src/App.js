@@ -16,29 +16,10 @@ function rankData(data) {
 
 function App() {
   const svgRef = useRef();
-  const randomData = [
-    {
-      name: "A",
-      number: 10
-    },
-    {
-      name: "B",
-      number: 20
-    },
-    {
-      name: "C",
-      number: 30
-    },
-    {
-      name: "D",
-      number: 40
-    },
-    {
-      name: "E",
-      number: 50
-    }
-  ];
-  const [data, setData] = useState(rankData(randomData));
+  const [timeSeriesData, setTimeSeriesData] = useState(null);
+  const [timeSeriesList, setTimeSeriesList] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [data, setData] = useState([]);
   const width = 800;
   const height = 650;
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
@@ -70,12 +51,13 @@ function App() {
       .ease(d3.easeLinear)
       .call(xAxis);
 
-
     /* *************** 接資料 *************** */
     handleCsv().then(res => {
-      console.log(res);
+      console.log(res)
+      setTimeSeriesData(res);
+      setTimeSeriesList(R.keys(res));
+      setData(R.values(res)[currentIndex]);
     });
-
   }, []);
 
   useEffect(() => {
