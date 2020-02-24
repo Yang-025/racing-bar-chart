@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import * as d3 from "d3";
 import * as R from "ramda";
 import "./App.css";
+import handleCsv from "./datahandle";
 import useInterval from "./hooks/useInterval";
 
 function rankData(data) {
@@ -68,6 +69,13 @@ function App() {
       .duration(tickDuration)
       .ease(d3.easeLinear)
       .call(xAxis);
+
+
+    /* *************** 接資料 *************** */
+    handleCsv().then(res => {
+      console.log(res);
+    });
+
   }, []);
 
   useEffect(() => {
