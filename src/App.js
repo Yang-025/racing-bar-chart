@@ -32,7 +32,10 @@ function App() {
     .domain(data.map((d, i) => d.rank))
     .range([margin.top, height - margin.bottom]);
 
-  const xAxis = d3.axisTop().ticks(5).scale(xScale);
+  const xAxis = d3
+    .axisTop()
+    .ticks(5)
+    .scale(xScale);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -134,6 +137,23 @@ function App() {
         };
       });
     /* *************** 隊伍勝場 END *************** */
+
+    /* ******************** 隊伍LOGO ******************** */
+    svg
+      .selectAll("image")
+      .data(data, d => d.name)
+      .join("image")
+      .attr("xlink:href", d => `/teams/${d.name}.gif`)
+      .attr("width", yScale.bandwidth())
+      .attr("height", yScale.bandwidth())
+      .transition()
+      .duration(tickDuration)
+      .ease(d3.easeLinear)
+      .style("fill-opacity", 1)
+      .attr("x", xScale(0) - 30)
+      .attr("y", d => yScale(d.rank));
+
+    /* ******************** 隊伍LOGO ******************** */
 
     /* *************** x軸 *************** */
     svg
