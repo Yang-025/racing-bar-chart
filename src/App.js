@@ -213,26 +213,47 @@ function App() {
     /* *************** 隊伍名稱 END *************** */
 
     /* *************** 隊伍勝場 *************** */
-    // svg
-    //   .selectAll("text.teamvalue")
-    //   .data(data, d => d.name)
-    //   .join("text")
-    //   .attr("class", "teamvalue")
-    //   .attr("dy", "20")
-    //   .style("text-anchor", "end")
-    //   .style("dominant-baseline", "middle")
-    //   .text(d => d.number)
-    //   .transition()
-    //   .duration(tickDuration)
-    //   .ease(d3.easeLinear)
-    //   .attr("x", d => xScale(d.number) - 6)
-    //   .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2)
-    //   .tween("text", function(d) {
-    //     let i = d3.interpolateRound(d.last_number || d.number, d.number);
-    //     return function(t) {
-    //       this.textContent = d3.format(",")(i(t));
-    //     };
-    //   });
+    svg
+      .selectAll("text.teamvalue")
+      .data(data, d => d.name)
+      .join(
+        enter =>
+          enter
+            .append("text")
+            .attr("x", d => {
+              let prevNumber = prevStats.get(d).number;
+              return xScale(prevNumber) - 6;
+            })
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2),
+        update => update,
+        exit =>
+          exit
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(tickDuration)
+            .attr("x", d => {
+              let nextNumber = nextStats.get(d).number;
+              return xScale(nextNumber) - 6;
+            })
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2)
+            .remove()
+      )
+      .attr("class", "teamvalue")
+      .attr("dy", "20")
+      .style("text-anchor", "end")
+      .style("dominant-baseline", "middle")
+      .text(d => d.number)
+      .transition()
+      .duration(tickDuration)
+      .ease(d3.easeLinear)
+      .attr("x", d => xScale(d.number) - 6)
+      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2)
+      .tween("text", function(d) {
+        let i = d3.interpolateRound(d.last_number || d.number, d.number);
+        return function(t) {
+          this.textContent = d3.format(",")(i(t));
+        };
+      });
     /* *************** 隊伍勝場 END *************** */
 
     /* ******************** 隊伍LOGO ******************** */
