@@ -32,10 +32,12 @@ function App() {
     .domain(data.map((d, i) => d.rank))
     .range([margin.top, height - margin.bottom]);
 
-  const xAxis = d3.axisTop().scale(xScale);
+  const xAxis = d3.axisTop().ticks(5).scale(xScale);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
+
+    /* *************** x軸 *************** */
     svg
       .append("g")
       .attr("class", "xAxis")
@@ -44,6 +46,18 @@ function App() {
       .duration(tickDuration)
       .ease(d3.easeLinear)
       .call(xAxis);
+    /* *************** x軸 END *************** */
+
+    /* *************** 顯示年月 *************** */
+    svg
+      .append("text")
+      .attr("class", "yearText")
+      .attr("x", width - margin.right)
+      .attr("y", height - margin.bottom - 20)
+      .style("text-anchor", "end")
+      .style("font-size", `20px`)
+      .text("");
+    /* *************** 顯示年月 END *************** */
 
     /* *************** 接資料 *************** */
     handleCsv().then(res => {
@@ -52,6 +66,7 @@ function App() {
       setTimeSeriesList(R.keys(res));
       setData(R.values(res)[currentIndex]);
     });
+    /* *************** 接資料 END *************** */
   }, []);
 
   useEffect(() => {
@@ -128,6 +143,12 @@ function App() {
       .ease(d3.easeLinear)
       .call(xAxis);
     /* *************** x軸 END *************** */
+
+    /* *************** 更新年月 *************** */
+    if (timeSeriesList.length > 0) {
+      d3.selectAll("text.yearText").text(timeSeriesList[currentIndex]);
+    }
+    /* *************** 更新年月 END *************** */
   }, [data, svgRef.current]);
 
   function updateDataset() {
