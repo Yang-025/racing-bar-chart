@@ -15,6 +15,7 @@ function App() {
   const width = 800;
   const height = 650;
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
+  const topN = 10;
   const initTickDuration = 1000;
   const [tickDuration, setTickDuration] = useState(
     mode === "manual" ? initTickDuration : null
@@ -67,7 +68,7 @@ function App() {
       console.log(res);
       setTimeSeriesData(res);
       setTimeSeriesList(R.keys(res));
-      setData(R.values(res)[currentIndex]);
+      filterData(R.values(res)[currentIndex]);
     });
     /* *************** 接資料 END *************** */
   }, []);
@@ -187,6 +188,11 @@ function App() {
     /* *************** 更新年月 END *************** */
   }, [data, svgRef.current]);
 
+
+  function filterData(data) {
+    setData(R.slice(0, topN, data));
+  }
+
   function updateDataset() {
     const next = currentIndex + 1;
     if (next >= timeSeriesList.length) {
@@ -194,7 +200,7 @@ function App() {
       setTickDuration(null);
     } else {
       setCurrentIndex(next);
-      setData(R.values(timeSeriesData)[next]);
+      filterData(R.values(timeSeriesData)[next]);
     }
   }
 
