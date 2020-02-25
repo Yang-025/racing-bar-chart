@@ -5,16 +5,8 @@ import "./App.css";
 import handleCsv from "./datahandle";
 import useInterval from "./hooks/useInterval";
 
-function rankData(data) {
-  const sortUpdatedData = R.sortWith([R.descend(R.prop("number"))])(data);
-
-  const addRankDataset = sortUpdatedData.map((d, i) => {
-    return { ...d, rank: i + 1 };
-  });
-  return addRankDataset;
-}
-
 function App() {
+  const mode = "auto";
   const svgRef = useRef();
   const [timeSeriesData, setTimeSeriesData] = useState(null);
   const [timeSeriesList, setTimeSeriesList] = useState([]);
@@ -24,7 +16,9 @@ function App() {
   const height = 650;
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
   const initTickDuration = 1000;
-  const [tickDuration, setTickDuration] = useState(null);
+  const [tickDuration, setTickDuration] = useState(
+    mode === "manual" ? initTickDuration : null
+  );
 
   const xScale = d3
     .scaleLinear()
@@ -53,7 +47,7 @@ function App() {
 
     /* *************** 接資料 *************** */
     handleCsv().then(res => {
-      console.log(res)
+      console.log(res);
       setTimeSeriesData(res);
       setTimeSeriesList(R.keys(res));
       setData(R.values(res)[currentIndex]);
@@ -137,19 +131,18 @@ function App() {
   }, [data, svgRef.current]);
 
   function updateDataset() {
-    const updatedData = data.map(d => {
-      return {
-        ...d,
-        number: d.number + Math.floor(Math.random() * Math.floor(200)),
-        last_number: d.number
-      };
-    });
-
-    setData(rankData(updatedData));
+    const next = currentIndex + 1;
+    if (next >= timeSeriesList.length) {
+      console.log("結束了");
+      setTickDuration(null);
+    } else {
+      setCurrentIndex(next);
+      setData(R.values(timeSeriesData)[next]);
+    }
   }
 
   useInterval(() => {
-    updateDataset();
+    mode === "auto" && updateDataset();
   }, tickDuration);
 
   return (
@@ -158,13 +151,25 @@ function App() {
         <h3>{`svg ${width}* ${height}`}</h3>
         <svg ref={svgRef} />
         <div>
-          {/* 手動  const [tickDuration, setTickDuration] = useState(initTickDuration); */}
-          {/* <button onClick={updateDataset}>測試</button> */}
-          {/* 自動 */}
-          <button onClick={() => setTickDuration(initTickDuration)}>
-            測試
-          </button>
-          <button onClick={() => setTickDuration(null)}>停止</button>
+          {mode === "manual" ? (
+            <div>
+              <button onClick={updateDataset}>手動測試</button>
+            </div>
+          ) : (
+            <div>
+              <button
+                onClick={() => {
+                  if (currentIndex === timeSeriesList.length - 1) {
+                    setCurrentIndex(0);
+                  }
+                  setTickDuration(initTickDuration);
+                }}
+              >
+                測試
+              </button>
+              <button onClick={() => setTickDuration(null)}>停止</button>
+            </div>
+          )}
         </div>
       </div>
     </div>
