@@ -20,6 +20,8 @@ function App() {
   const [tickDuration, setTickDuration] = useState(
     mode === "manual" ? initTickDuration : null
   );
+  const [prevStats, setPrevStats] = useState(null);
+  const [nextStats, setNextStats] = useState(null);
 
   const xScale = d3
     .scaleLinear()
@@ -37,6 +39,38 @@ function App() {
     .axisTop()
     .ticks(5)
     .scale(xScale);
+
+  // 先整理出隊伍上個月和下個月的資料Mapping
+  function handlePrevAndNext(data) {
+    const nameframes = R.pipe(
+      R.chain(R.flatten),
+      R.groupBy(R.prop("name"))
+    )(R.values(data));
+
+    let prevMap = new Map();
+    let nextMap = new Map();
+    R.map(frames => {
+      frames.forEach((frame, index) => {
+        if (index === 0) {
+          prevMap.set(frame, frame);
+        } else {
+          prevMap.set(frame, frames[index - 1]);
+        }
+      });
+    })(R.values(nameframes));
+
+    R.map(frames => {
+      frames.forEach((frame, index) => {
+        if (index === frames.length - 1) {
+          nextMap.set(frame, frame);
+        } else {
+          nextMap.set(frame, frames[index + 1]);
+        }
+      });
+    })(R.values(nameframes));
+
+    return [prevMap, nextMap];
+  }
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -68,6 +102,9 @@ function App() {
       console.log(res);
       setTimeSeriesData(res);
       setTimeSeriesList(R.keys(res));
+      const [prevMap, nextMap] = handlePrevAndNext(res);
+      setPrevStats(prevMap);
+      setNextStats(nextMap);
       filterData(R.values(res)[currentIndex]);
     });
     /* *************** 接資料 END *************** */
@@ -187,7 +224,6 @@ function App() {
     }
     /* *************** 更新年月 END *************** */
   }, [data, svgRef.current]);
-
 
   function filterData(data) {
     setData(R.slice(0, topN, data));
