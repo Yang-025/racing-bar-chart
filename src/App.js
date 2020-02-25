@@ -7,7 +7,7 @@ import useInterval from "./hooks/useInterval";
 
 function App() {
   // manual || auto
-  const mode = "manual";
+  const mode = "auto";
   const svgRef = useRef();
   const [timeSeriesData, setTimeSeriesData] = useState(null);
   const [timeSeriesList, setTimeSeriesList] = useState([]);
@@ -335,7 +335,8 @@ function App() {
               <button
                 onClick={() => {
                   if (currentIndex === timeSeriesList.length - 1) {
-                    setCurrentIndex(0);
+                    setData([])
+                    setCurrentIndex(-1)
                   }
                   setTickDuration(initTickDuration);
                 }}
