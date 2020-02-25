@@ -257,19 +257,32 @@ function App() {
     /* *************** 隊伍勝場 END *************** */
 
     /* ******************** 隊伍LOGO ******************** */
-    // svg
-    //   .selectAll("image")
-    //   .data(data, d => d.name)
-    //   .join("image")
-    //   .attr("xlink:href", d => `/teams/${d.name}.gif`)
-    //   .attr("width", yScale.bandwidth())
-    //   .attr("height", yScale.bandwidth())
-    //   .transition()
-    //   .duration(tickDuration)
-    //   .ease(d3.easeLinear)
-    //   .style("fill-opacity", 1)
-    //   .attr("x", xScale(0) - 30)
-    //   .attr("y", d => yScale(d.rank));
+    svg
+      .selectAll("image")
+      .data(data, d => d.name)
+      .join(
+        enter =>
+          enter
+            .append("image")
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2),
+        update => update,
+        exit =>
+          exit
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(tickDuration)
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2)
+            .remove()
+      )
+      .attr("xlink:href", d => `/teams/${d.name}.gif`)
+      .attr("width", yScale.bandwidth())
+      .attr("height", yScale.bandwidth())
+      .transition()
+      .duration(tickDuration)
+      .ease(d3.easeLinear)
+      .style("fill-opacity", 1)
+      .attr("x", xScale(0) - 30)
+      .attr("y", d => yScale(d.rank));
     /* ******************** 隊伍LOGO ******************** */
 
     /* *************** x軸 *************** */
