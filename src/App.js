@@ -6,7 +6,8 @@ import handleCsv from "./datahandle";
 import useInterval from "./hooks/useInterval";
 
 function App() {
-  const mode = "auto";
+  // manual || auto
+  const mode = "manual";
   const svgRef = useRef();
   const [timeSeriesData, setTimeSeriesData] = useState(null);
   const [timeSeriesList, setTimeSeriesList] = useState([]);
@@ -139,7 +140,28 @@ function App() {
     svg
       .selectAll("rect")
       .data(data, d => d.name)
-      .join("rect")
+      .join(
+        enter =>
+          enter
+            .append("rect")
+            .attr("width", d => {
+              let prevNumber = prevStats.get(d).number;
+              return xScale(prevNumber) - xScale(0);
+            })
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2),
+        update => update,
+        exit =>
+          exit
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(tickDuration)
+            .attr("width", d => {
+              let nextNumber = nextStats.get(d).number;
+              return xScale(nextNumber) - xScale(0);
+            })
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2)
+            .remove()
+      )
       .attr("fill-opacity", 0.6)
       .attr("x", xScale(0))
       .attr("height", yScale.bandwidth())
@@ -152,61 +174,60 @@ function App() {
     /* *************** 長條 END *************** */
 
     /* *************** 隊伍名稱 *************** */
-    svg
-      .selectAll("text.teamname")
-      .data(data, d => d.name)
-      .join("text")
-      .attr("fill-opacity", 0.7)
-      .attr("class", "teamname")
-      .attr("font-weight", "bold")
-      .style("text-anchor", "end")
-      .style("dominant-baseline", "middle")
-      .text(d => d.name)
-      .transition()
-      .duration(tickDuration)
-      .ease(d3.easeLinear)
-      .attr("x", d => xScale(d.number) - 6)
-      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2);
+    // svg
+    //   .selectAll("text.teamname")
+    //   .data(data, d => d.name)
+    //   .join("text")
+    //   .attr("fill-opacity", 0.7)
+    //   .attr("class", "teamname")
+    //   .attr("font-weight", "bold")
+    //   .style("text-anchor", "end")
+    //   .style("dominant-baseline", "middle")
+    //   .text(d => d.name)
+    //   .transition()
+    //   .duration(tickDuration)
+    //   .ease(d3.easeLinear)
+    //   .attr("x", d => xScale(d.number) - 6)
+    //   .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2);
     /* *************** 隊伍名稱 END *************** */
 
     /* *************** 隊伍勝場 *************** */
-    svg
-      .selectAll("text.teamvalue")
-      .data(data, d => d.name)
-      .join("text")
-      .attr("class", "teamvalue")
-      .attr("dy", "20")
-      .style("text-anchor", "end")
-      .style("dominant-baseline", "middle")
-      .text(d => d.number)
-      .transition()
-      .duration(tickDuration)
-      .ease(d3.easeLinear)
-      .attr("x", d => xScale(d.number) - 6)
-      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2)
-      .tween("text", function(d) {
-        let i = d3.interpolateRound(d.last_number || d.number, d.number);
-        return function(t) {
-          this.textContent = d3.format(",")(i(t));
-        };
-      });
+    // svg
+    //   .selectAll("text.teamvalue")
+    //   .data(data, d => d.name)
+    //   .join("text")
+    //   .attr("class", "teamvalue")
+    //   .attr("dy", "20")
+    //   .style("text-anchor", "end")
+    //   .style("dominant-baseline", "middle")
+    //   .text(d => d.number)
+    //   .transition()
+    //   .duration(tickDuration)
+    //   .ease(d3.easeLinear)
+    //   .attr("x", d => xScale(d.number) - 6)
+    //   .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2)
+    //   .tween("text", function(d) {
+    //     let i = d3.interpolateRound(d.last_number || d.number, d.number);
+    //     return function(t) {
+    //       this.textContent = d3.format(",")(i(t));
+    //     };
+    //   });
     /* *************** 隊伍勝場 END *************** */
 
     /* ******************** 隊伍LOGO ******************** */
-    svg
-      .selectAll("image")
-      .data(data, d => d.name)
-      .join("image")
-      .attr("xlink:href", d => `/teams/${d.name}.gif`)
-      .attr("width", yScale.bandwidth())
-      .attr("height", yScale.bandwidth())
-      .transition()
-      .duration(tickDuration)
-      .ease(d3.easeLinear)
-      .style("fill-opacity", 1)
-      .attr("x", xScale(0) - 30)
-      .attr("y", d => yScale(d.rank));
-
+    // svg
+    //   .selectAll("image")
+    //   .data(data, d => d.name)
+    //   .join("image")
+    //   .attr("xlink:href", d => `/teams/${d.name}.gif`)
+    //   .attr("width", yScale.bandwidth())
+    //   .attr("height", yScale.bandwidth())
+    //   .transition()
+    //   .duration(tickDuration)
+    //   .ease(d3.easeLinear)
+    //   .style("fill-opacity", 1)
+    //   .attr("x", xScale(0) - 30)
+    //   .attr("y", d => yScale(d.rank));
     /* ******************** 隊伍LOGO ******************** */
 
     /* *************** x軸 *************** */
