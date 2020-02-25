@@ -174,21 +174,42 @@ function App() {
     /* *************** 長條 END *************** */
 
     /* *************** 隊伍名稱 *************** */
-    // svg
-    //   .selectAll("text.teamname")
-    //   .data(data, d => d.name)
-    //   .join("text")
-    //   .attr("fill-opacity", 0.7)
-    //   .attr("class", "teamname")
-    //   .attr("font-weight", "bold")
-    //   .style("text-anchor", "end")
-    //   .style("dominant-baseline", "middle")
-    //   .text(d => d.name)
-    //   .transition()
-    //   .duration(tickDuration)
-    //   .ease(d3.easeLinear)
-    //   .attr("x", d => xScale(d.number) - 6)
-    //   .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2);
+    svg
+      .selectAll("text.teamname")
+      .data(data, d => d.name)
+      .join(
+        enter =>
+          enter
+            .append("text")
+            .attr("x", d => {
+              let prevNumber = prevStats.get(d).number;
+              return xScale(prevNumber) - 6;
+            })
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2),
+        update => update,
+        exit =>
+          exit
+            .transition()
+            .ease(d3.easeLinear)
+            .duration(tickDuration)
+            .attr("x", d => {
+              let nextNumber = nextStats.get(d).number;
+              return xScale(nextNumber) - 6;
+            })
+            .attr("y", () => yScale(topN) + yScale.bandwidth() * 2)
+            .remove()
+      )
+      .attr("fill-opacity", 0.7)
+      .attr("class", "teamname")
+      .attr("font-weight", "bold")
+      .style("text-anchor", "end")
+      .style("dominant-baseline", "middle")
+      .text(d => d.name)
+      .transition()
+      .duration(tickDuration)
+      .ease(d3.easeLinear)
+      .attr("x", d => xScale(d.number) - 6)
+      .attr("y", d => yScale(d.rank) + yScale.bandwidth() / 2);
     /* *************** 隊伍名稱 END *************** */
 
     /* *************** 隊伍勝場 *************** */
