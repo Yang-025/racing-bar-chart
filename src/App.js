@@ -79,7 +79,23 @@ function App() {
 
     const colorScale = d3
       .scaleOrdinal(d3.schemeTableau10)
-      .domain(["A", "B", "C", "D", "E"]);
+      .domain([
+        "Dallas Mavericks",
+        "Denver Nuggets",
+        "Golden State Warriors",
+        "Houston Rockets",
+        "Los Angeles Clippers",
+        "Los Angeles Lakers",
+        "Memphis Grizzlies",
+        "Minnesota Timberwolves",
+        "New Orleans Pelicans",
+        "Oklahoma City Thunder",
+        "Phoenix Suns",
+        "Portland Trail Blazers",
+        "Sacramento Kings",
+        "San Antonio Spurs",
+        "Utah Jazz"
+      ]);
 
     /* *************** 長條 *************** */
     svg
