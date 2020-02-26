@@ -6,23 +6,21 @@ import handleCsv from "./datahandle";
 import useInterval from "./hooks/useInterval";
 
 function App() {
-  // manual || auto
-  const mode = "auto";
   const svgRef = useRef();
-  const [timeSeriesData, setTimeSeriesData] = useState(null);
-  const [timeSeriesList, setTimeSeriesList] = useState([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [data, setData] = useState([]);
+  const [timeSeriesData, setTimeSeriesData] = useState([]);
+  const [currentData, setCurrentData] = useState([null, []]);
   const width = 800;
   const height = 650;
   const margin = { top: 30, right: 30, bottom: 30, left: 30 };
   const topN = 10;
-  const initTickDuration = 1000;
-  const [tickDuration, setTickDuration] = useState(
-    mode === "manual" ? initTickDuration : null
-  );
+  const initTickDuration = 1500;
+  const tickDuration = initTickDuration;
   const [prevStats, setPrevStats] = useState(null);
   const [nextStats, setNextStats] = useState(null);
+
+  const [date, tmpData] = currentData;
+
+  const data = R.slice(0, topN, tmpData);
 
   const xScale = d3
     .scaleLinear()
@@ -100,13 +98,12 @@ function App() {
 
     /* *************** 接資料 *************** */
     handleCsv().then(res => {
-      console.log(res);
-      setTimeSeriesData(res);
-      setTimeSeriesList(R.keys(res));
+      // console.log(R.toPairs(res));
+      setTimeSeriesData(R.toPairs(res));
       const [prevMap, nextMap] = handlePrevAndNext(res);
       setPrevStats(prevMap);
       setNextStats(nextMap);
-      filterData(R.values(res)[currentIndex]);
+      setCurrentData(R.toPairs(res)[0]);
     });
     /* *************** 接資料 END *************** */
   }, []);
@@ -295,30 +292,11 @@ function App() {
     /* *************** x軸 END *************** */
 
     /* *************** 更新年月 *************** */
-    if (timeSeriesList.length > 0) {
-      d3.selectAll("text.yearText").text(timeSeriesList[currentIndex]);
+    if (date) {
+      d3.selectAll("text.yearText").text(date);
     }
     /* *************** 更新年月 END *************** */
   }, [data, svgRef.current]);
-
-  function filterData(data) {
-    setData(R.slice(0, topN, data));
-  }
-
-  function updateDataset() {
-    const next = currentIndex + 1;
-    if (next >= timeSeriesList.length) {
-      console.log("結束了");
-      setTickDuration(null);
-    } else {
-      setCurrentIndex(next);
-      filterData(R.values(timeSeriesData)[next]);
-    }
-  }
-
-  useInterval(() => {
-    mode === "auto" && updateDataset();
-  }, tickDuration);
 
   return (
     <div className="app">
@@ -326,26 +304,43 @@ function App() {
         <h3>{`svg ${width}* ${height}`}</h3>
         <svg ref={svgRef} />
         <div>
-          {mode === "manual" ? (
-            <div>
-              <button onClick={updateDataset}>手動測試</button>
-            </div>
-          ) : (
-            <div>
-              <button
-                onClick={() => {
-                  if (currentIndex === timeSeriesList.length - 1) {
-                    setData([])
-                    setCurrentIndex(-1)
-                  }
-                  setTickDuration(initTickDuration);
-                }}
-              >
-                測試
-              </button>
-              <button onClick={() => setTickDuration(null)}>停止</button>
-            </div>
-          )}
+          <div>
+            <button
+              onClick={async () => {
+                if (
+                  R.indexOf(currentData)(timeSeriesData) ===
+                  timeSeriesData.length - 1
+                ) {
+                  d3.select(svgRef.current)
+                    .selectAll("text.teamvalue")
+                    .remove();
+                  d3.select(svgRef.current)
+                    .selectAll("text.teamname")
+                    .remove();
+                  d3.select(svgRef.current)
+                    .selectAll("rect")
+                    .remove();
+                  d3.select(svgRef.current)
+                    .selectAll("image")
+                    .remove();
+                }
+
+                function delay(ms) {
+                  return new Promise(function(resolve, reject) {
+                    setTimeout(function() {
+                      resolve();
+                    }, ms);
+                  });
+                }
+                for (const value of timeSeriesData) {
+                  setCurrentData(value);
+                  await delay(initTickDuration);
+                }
+              }}
+            >
+              測試
+            </button>
+          </div>
         </div>
       </div>
     </div>
