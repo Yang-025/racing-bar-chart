@@ -49,6 +49,8 @@
 
 [youtube](https://www.youtube.com/playlist?list=PLsKJIR9go2RntBKjaFtgUoDPSmd605jDn)
 
+### Blog
+[D3js畫的Racing Bar Chart](https://www.winsomeyang.com/series/d3js%E7%95%AB%E7%9A%84racing-bar-chart/d3js%E7%95%AB%E7%9A%84racing-bar-chart-1intro)
 ---
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
